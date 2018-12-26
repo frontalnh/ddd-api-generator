@@ -3,6 +3,7 @@
 'use strict';
 const program = require('commander');
 const fs = require('fs');
+const all = 'all';
 const repo = 'repo';
 const repoimpl = 'repoimpl';
 const route = 'route';
@@ -31,6 +32,12 @@ program
         let result = generateRoute(component, domain);
         return result;
       }
+      case all: {
+        generateRepository(component, domain);
+        generateRepositoryImpl(component, domain);
+        generateRoute(component, domain);
+        return;
+      }
     }
   });
 
@@ -56,7 +63,7 @@ export interface ${upper}Repository {
   delete(option: DestroyOptions): Promise<number>;
 }
 `;
-  fs.appendFileSync(`${repoPath}/${domain}/${domain}.repository.ts`, content);
+  fs.writeFileSync(`${repoPath}/${domain}/${domain}.repository.ts`, content);
   return;
 }
 
@@ -96,7 +103,7 @@ export class ${upper}RepositoryImpl {
   }
 }
 `;
-  fs.appendFileSync(`${repoImplPath}/${domain}.repository.impl.ts`, content);
+  fs.writeFileSync(`${repoImplPath}/${domain}.repository.impl.ts`, content);
   return;
 }
 
@@ -199,7 +206,7 @@ export class ${upper}Route implements Route {
   }
 }
 `;
-  fs.appendFileSync(`${routePath}/${domain}.route.ts`, content);
+  fs.writeFileSync(`${routePath}/${domain}.route.ts`, content);
   return;
 }
 
