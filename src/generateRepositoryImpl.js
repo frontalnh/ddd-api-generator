@@ -11,6 +11,7 @@ module.exports = function generateRepositoryImpl(component, domain) {
   import { DestroyOptions, UpdateOptions } from 'sequelize';
   import { Filter } from '@common/models/QueryOption';
   import { ICountOptions } from 'sequelize-typescript';
+  import { removeDotInJson } from '@frontalnh/json-dot-parser';
 
   export class ${upper}RepositoryImpl {
     constructor() {}
