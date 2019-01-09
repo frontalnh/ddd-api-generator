@@ -16,12 +16,18 @@ module.exports = function generateRepositoryImpl(component, domain) {
     constructor() {}
   
     async save(${camel}: ${upper}) {
-      const _ = ${upper}.build(${camel});
-      return await _.save();
+      return await ${camel}.save();
     }
   
     async findAll(filter: Filter) {
-      return await ${upper}.findAll(filter);
+      if (!filter.raw) return await Asset.findAll(filter);
+
+      let datas = await ${upper}.findAll(filter);
+      for (let data of datas) {
+        removeDotInJson(data);
+      }
+  
+      return datas;
     }
   
     async findById(id: number) {

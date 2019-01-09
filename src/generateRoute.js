@@ -11,7 +11,10 @@ module.exports = function generateRoute(component, domain) {
   import * as express from 'express';
   import { httpSuccessResponse } from '@utils/httpSender';
   import { ${upper}Repository } from '@domain/${domain}/${domain}.repository';
-  
+  import { FilterSchema } from '@common/validateSchemas/FilterSchema';
+  import Joi from 'joi';
+  import { ${upper} } from '@domain/${camel}/${camel}.model';
+
   export class ${upper}Route implements Route {
     private router: express.Router;
     constructor(private ${camel}Repository: ${upper}Repository) {
@@ -32,9 +35,8 @@ module.exports = function generateRoute(component, domain) {
       res: express.Response,
       next: express.NextFunction
     ) {
-      try {
-        let ${camel} = req.body;
-  
+      try {        
+        let ${camel} = new ${upper}(req.body)
         let created = await this.${camel}Repository.save(${camel});
         return res.send(created);
       } catch (err) {
@@ -49,7 +51,13 @@ module.exports = function generateRoute(component, domain) {
       next: express.NextFunction
     ) {
       try {
-        let payload = await this.${camel}Repository.findAll(req.query);
+        let { value, error } = Joi.validate(req.query, FilterSchema, {
+          convert: true
+        });
+  
+        if (error) return next(error);
+        
+        let payload = await this.${camel}Repository.findAll(value);
         return httpSuccessResponse(res, {payload});
       } catch (err) {
         return next(err);
