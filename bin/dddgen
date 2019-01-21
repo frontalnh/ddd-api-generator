@@ -6,8 +6,10 @@ const all = 'all';
 const repo = 'repo';
 const repoimpl = 'repoimpl';
 const route = 'route';
+const test = 'test';
 
 const generateRoute = require('../src/generateRoute');
+const generateRouteTest = require('../src/generateRouteTest');
 const generateRepositoryImpl = require('../src/generateRepositoryImpl');
 const generateRepository = require('../src/generateRepository');
 
@@ -31,12 +33,18 @@ program
       }
       case route: {
         let result = generateRoute(component, domain);
+        generateRouteTest(component, domain);
+        return result;
+      }
+      case test: {
+        let result = generateRouteTest(component, domain);
         return result;
       }
       case all: {
         generateRepository(domain);
         generateRepositoryImpl(component, domain);
         generateRoute(component, domain);
+        generateRouteTest(component, domain);
         return;
       }
     }

@@ -13,7 +13,7 @@ module.exports = function generateRoute(component, domain) {
   import { ${upper}Repository } from '@domain/${domain}/${domain}.repository';
   import { FilterSchema } from '@common/validateSchemas/FilterSchema';
   import Joi from 'joi';
-  import { ${upper} } from '@domain/${camel}/${camel}.model';
+  import { ${upper} } from '@domain/${domain}/${domain}.model';
 
   export class ${upper}Route implements Route {
     private router: express.Router;
@@ -22,10 +22,135 @@ module.exports = function generateRoute(component, domain) {
       this.router = express.Router();
     }
     handle() {
+      /**
+       * @swagger
+       * /${domain}s:
+       *   post:
+       *     description: ${upper} API
+       *     tags:
+       *       - ${upper}s
+       *     produces:
+       *       - application/json
+       *     parameters:
+       *       - in: body
+       *         name: body
+       *         schema:
+       *           $ref: '#/definitions/${upper}'
+       *     responses:
+       *       200:
+       *         description: Success
+       *         schema:
+       *           $ref: '#/definitions/${upper}'
+       */
       this.router.post('', (...args) => this.create(...args));
+      /**
+       * @swagger
+       * /${domain}s:
+       *   get:
+       *     description: ${upper} API
+       *     tags:
+       *       - ${upper}s
+       *     produces:
+       *       - application/json
+       *     parameters:
+       *       - in: query
+       *         name: where
+       *         type: object
+       *         description: Where clause explains about the constraints used in find data
+       *       - in: query
+       *         name: limit
+       *         type: integer
+       *         description: How many data do you want?
+       *       - in: query
+       *         name: offset
+       *         type: integer
+       *         description: Where to start find data
+       *     responses:
+       *       200:
+       *         description: Success
+       *         schema:
+       *           type: object
+       *           properties:
+       *             payload:
+       *               type: array
+       *               items:
+       *                 $ref: '#/definitions/${upper}'
+       */
       this.router.get('', (...args) => this.findAll(...args));
+      /**
+       * @swagger
+       * /${domain}s/{id}:
+       *   get:
+       *     description: ${upper} API
+       *     tags:
+       *       - ${upper}s
+       *     produces:
+       *       - application/json
+       *     parameters:
+       *       - in: path
+       *         name: id
+       *         type: number
+       *         description: Single ${camel}
+       *     responses:
+       *       200:
+       *         description: Success
+       *         schema:
+       *           $ref: '#/definitions/${upper}'
+       */
       this.router.get('/:id', (...args) => this.findById(...args));
+      /**
+       * @swagger
+       * /${domain}s:
+       *   put:
+       *     description: Update ${camel}
+       *     tags:
+       *       - ${upper}s
+       *     produces:
+       *       - application/json
+       *     parameters:
+       *       - in: body
+       *         name: body
+       *         schema:
+       *           properties:
+       *             data:
+       *               $ref: '#/definitions/${upper}'
+       *             option:
+       *               type: object
+       *               schema:
+       *                 type: object
+       *                 properties:
+       *                   where:
+       *                     type: string
+       *     responses:
+       *       200:
+       *         description: Success
+       *         schema:
+       *           $ref: '#/definitions/${upper}'
+       */
       this.router.put('', (...args) => this.update(...args));
+  
+      /**
+       * @swagger
+       * /${domain}s:
+       *   delete:
+       *     description: Delete ${camel}
+       *     tags:
+       *       - ${upper}s
+       *     produces:
+       *       - application/json
+       *     parameters:
+       *       - in: body
+       *         name: body
+       *         schema:
+       *           $ref: '#/definitions/${upper}'
+       *     responses:
+       *       200:
+       *         description: Success
+       *         schema:
+       *           properties:
+       *             count:
+       *               type: integer
+       */
       this.router.delete('', (...args) => this.remove(...args));
       return this.router;
     }
@@ -85,8 +210,8 @@ module.exports = function generateRoute(component, domain) {
       next: express.NextFunction
     ) {
       try {
-        let { ${camel}, option } = req.body;
-        let [count, payload] = await this.${camel}Repository.update(${camel}, option);
+        let { data, option } = req.body;
+        let [count, payload] = await this.${camel}Repository.update(data, option);
   
         return httpSuccessResponse(res, {payload, count});
       } catch (err) {
@@ -103,7 +228,7 @@ module.exports = function generateRoute(component, domain) {
         let option = req.body;
         let count = await this.${camel}Repository.delete(option);
   
-        res.send(count.toString());
+        return httpSuccessResponse(res, { count })
       } catch (err) {
         return next(err);
       }

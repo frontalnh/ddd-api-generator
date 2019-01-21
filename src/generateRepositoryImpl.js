@@ -21,11 +21,11 @@ module.exports = function generateRepositoryImpl(component, domain) {
     }
   
     async findAll(filter: Filter) {
-      if (!filter.raw) return await Asset.findAll(filter);
+      if (!filter.raw) return await ${upper}.findAll(filter);
 
       let datas = await ${upper}.findAll(filter);
       for (let data of datas) {
-        removeDotInJson(data);
+        Object.assign(data, removeDotInJson(data));
       }
   
       return datas;
