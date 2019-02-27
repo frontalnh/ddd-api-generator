@@ -7,18 +7,18 @@ module.exports = function generateRoute(component, domain) {
   let camel = makeCamel(domain);
   let upper = camel[0].toUpperCase() + camel.slice(1, camel.length);
   const content = `
-  import { Route } from 'server/common/models/Route';
+  import { Route } from '@common/models/Route';
   import * as express from 'express';
   import { httpSuccessResponse } from '@utils/httpSender';
-  import { ${upper}Repository } from '@domain/${domain}/${domain}.repository';
+  import { I${upper}Repository } from '@domain/${domain}/${domain}.repository';
   import { FilterSchema } from '@common/validateSchemas/FilterSchema';
   import Joi from 'joi';
   import { ${upper} } from '@domain/${domain}/${domain}.model';
 
   export class ${upper}Route implements Route {
     private router: express.Router;
-    constructor(private ${camel}Repository: ${upper}Repository) {
-      this.${camel}Repository = ${camel}Repository;
+    constructor(private ${camel}Repository: I${upper}Repository) {
+
       this.router = express.Router();
     }
     handle() {
@@ -183,6 +183,7 @@ module.exports = function generateRoute(component, domain) {
         if (error) return next(error);
         
         let payload = await this.${camel}Repository.findAll(value);
+        
         return httpSuccessResponse(res, {payload});
       } catch (err) {
         return next(err);

@@ -9,18 +9,21 @@ module.exports = function generateRepository(domain) {
 
   console.log('Generate repository');
   let content = `import { ${upper} } from '@domain/${domain}/${domain}.model';
-  import { UpdateOption, Filter } from '@common/models/QueryOption';
-  import { DestroyOptions } from 'sequelize';
+  import { IUpdateOption, IFilter } from '@common/models/QueryOption';
+  import { DestroyOptions, AggregateOptions } from 'sequelize';
   import { ICountOptions } from 'sequelize-typescript';
+  import sequelize from 'sequelize';
 
   export interface ${upper}Repository {
     save(${camel}: ${upper}): Promise<${upper}>;
-    findAll(filter: Filter): Promise<${upper}[]>;
+    saveWithTx(${camel}: ${upper}, transaction: sequelize.Transaction): Promise<${upper}>;
+    findAll(filter: IFilter<${upper}>): Promise<${upper}[]>;
     findById(id: number): Promise<${upper}>;
     getCount(filter: ICountOptions<${upper}>): Promise<number>;
+    getSum(prop: string, option: AggregateOptions): Promise<number>;
     update(
       ${camel}: Partial<${upper}>,
-      option: UpdateOption<${upper}>
+      option: IUpdateOption<${upper}>
     ): Promise<[number, ${upper}[]]>;
     delete(option: DestroyOptions): Promise<number>;
   }

@@ -8,7 +8,7 @@ module.exports = function generateRepositoryImpl(component, domain) {
   let upper = camel[0].toUpperCase() + camel.slice(1, camel.length);
   let content = `
   import { ${upper} } from '@domain/${domain}/${domain}.model';
-  import { DestroyOptions, UpdateOptions } from 'sequelize';
+  import sequelize, { DestroyOptions, UpdateOptions, AggregateOptions } from 'sequelize';
   import { Filter } from '@common/models/QueryOption';
   import { ICountOptions } from 'sequelize-typescript';
   import { removeDotInJson } from '@frontalnh/json-dot-parser';
@@ -18,6 +18,10 @@ module.exports = function generateRepositoryImpl(component, domain) {
   
     async save(${camel}: ${upper}) {
       return await ${camel}.save();
+    }
+  
+    async saveWithTx(${camel}: ${upper}, transaction: sequelize.Transaction) {
+      return await ${camel}.save({ transaction });
     }
   
     async findAll(filter: Filter) {
@@ -37,6 +41,10 @@ module.exports = function generateRepositoryImpl(component, domain) {
 
     async getCount(filter: ICountOptions<${upper}>) {
       return await ${upper}.count(filter);
+    }
+
+    public async getSum(prop, filter: AggregateOptions) {
+      return ${upper}.sum(prop, filter);
     }
   
     async update(

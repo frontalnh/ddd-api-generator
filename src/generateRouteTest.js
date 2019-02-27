@@ -28,7 +28,7 @@ module.exports = function generateRouteTest(component, domain) {
         let res = await request(app).get('/api/v1/${domain}s');
       });
     });
-    describe('UPDATE: /${domain}s', () => {
+    describe('PUT: /${domain}s', () => {
       it('success', async () => {
         let res = await request(app).put('/api/v1/${domain}s');
       });
