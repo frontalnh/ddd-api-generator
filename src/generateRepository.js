@@ -1,4 +1,4 @@
-const repoPath = 'src/server/domain';
+const repoPath = 'src/domain';
 const makeCamel = require('./utils');
 const fs = require('fs');
 const mkdirp = require('mkdirp');
@@ -10,26 +10,22 @@ module.exports = function generateRepository(domain) {
   console.log('Generate repository');
   let content = `import { ${upper} } from '@domain/${domain}/${domain}.model';
   import { IUpdateOption, IFilter } from '@common/models/QueryOption';
-  import { DestroyOptions, AggregateOptions } from 'sequelize';
+  import { DestroyOptions, AggregateOptions, Transaction } from 'sequelize';
   import { ICountOptions } from 'sequelize-typescript';
-  import sequelize from 'sequelize';
 
-  export interface ${upper}Repository {
+  export interface I${upper}Repository {
     save(${camel}: ${upper}): Promise<${upper}>;
-    saveWithTx(${camel}: ${upper}, transaction: sequelize.Transaction): Promise<${upper}>;
+    saveWithTx(${camel}: ${upper}, transaction: Transaction): Promise<${upper}>;
     findAll(filter: IFilter<${upper}>): Promise<${upper}[]>;
     findById(id: number): Promise<${upper}>;
     getCount(filter: ICountOptions<${upper}>): Promise<number>;
     getSum(prop: string, option: AggregateOptions): Promise<number>;
-    update(
-      ${camel}: Partial<${upper}>,
-      option: IUpdateOption<${upper}>
-    ): Promise<[number, ${upper}[]]>;
+    update( ${camel}: Partial<${upper}>, option: IUpdateOption<${upper}> ): Promise<number>;
     delete(option: DestroyOptions): Promise<number>;
   }
   `;
   // fs.mkdirSync(, { recursive: true });
-  // fs.mkdirSync('hello/server/domain', { recursive: true });
+  // fs.mkdirSync('hello/domain', { recursive: true });
 
   mkdirp.sync(`${repoPath}/${domain}`);
   fs.writeFileSync(`${repoPath}/${domain}/${domain}.repository.ts`, content);

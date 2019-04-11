@@ -1,4 +1,4 @@
-const repoImplPath = './src/server/infra/sequelizejs/mysql/repositories';
+const repoImplPath = './src/infra/sequelizejs/mysql/repositories';
 const makeCamel = require('./utils');
 const fs = require('fs');
 const mkdirp = require('mkdirp');
@@ -8,8 +8,8 @@ module.exports = function generateRepositoryImpl(component, domain) {
   let upper = camel[0].toUpperCase() + camel.slice(1, camel.length);
   let content = `
   import { ${upper} } from '@domain/${domain}/${domain}.model';
-  import sequelize, { DestroyOptions, UpdateOptions, AggregateOptions } from 'sequelize';
-  import { Filter } from '@common/models/QueryOption';
+  import { DestroyOptions, UpdateOptions, AggregateOptions, Transaction } from 'sequelize';
+  import { IFilter } from '@common/models/QueryOption';
   import { ICountOptions } from 'sequelize-typescript';
   import { removeDotInJson } from '@frontalnh/json-dot-parser';
 
@@ -20,13 +20,16 @@ module.exports = function generateRepositoryImpl(component, domain) {
       return await ${camel}.save();
     }
   
-    async saveWithTx(${camel}: ${upper}, transaction: sequelize.Transaction) {
+    async saveWithTx(${camel}: ${upper}, transaction: Transaction) {
       return await ${camel}.save({ transaction });
     }
   
-    async findAll(filter: Filter) {
-      if (!filter.raw) return await ${upper}.findAll(filter);
-
+    public async findAll(filter: IFilter<${upper}>) {
+      if (filter.searchKey) {
+        Object.assign(filter.where, { $or: [{ name: { $like: '%' + filter.searchKey + '%' } }] });
+      }
+      if (!filter.raw) return ${upper}.findAll(filter);
+  
       let datas = await ${upper}.findAll(filter);
       for (let data of datas) {
         Object.assign(data, removeDotInJson(data));
@@ -50,8 +53,10 @@ module.exports = function generateRepositoryImpl(component, domain) {
     async update(
       ${camel}: Partial<${upper}>,
       option: UpdateOptions
-    ): Promise<[number, ${upper}[]]> {
-      return await ${upper}.update(${camel}, option);
+    ): Promise<number> {
+      let [count] = await ${upper}.update(${camel}, option);
+
+      return count;
     }
   
     async delete(option: DestroyOptions): Promise<number> {

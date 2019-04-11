@@ -50,10 +50,10 @@ dddgen generate all -n user
 
 각 컴포넌트들의 기본 경로는 다음과 같다.
 
-repository: `./src/server/domain/[도메인 명]/[도메인 명].repository.ts`
+repository: `./src/domain/[도메인 명]/[도메인 명].repository.ts`
 
-repository implementation: `./src/server/infra/sequelize/mysql/repositories/[도메인 명].repository.impl.ts`
+repository implementation: `./src/infra/sequelize/mysql/repositories/[도메인 명].repository.impl.ts`
 
-route: `./src/server/interfaces/http/[도메인 명].route.ts`
+route: `./src/interfaces/http/[도메인 명].route.ts`
 
 해당 경로를 위한 디렉토리들이 모두 생성되어 있어야 하며, 이를 수정하고자 한다면 `dddgen` 파일의 repoPath, repoImplPath, routePath를 수정해 주면 된다.

@@ -1,4 +1,4 @@
-const routePath = './src/server/interfaces/http';
+const routePath = './src/interfaces/http';
 const makeCamel = require('./utils');
 const fs = require('fs');
 const mkdirp = require('mkdirp');
@@ -8,15 +8,11 @@ module.exports = function generateRouteTest(component, domain) {
   let upper = camel[0].toUpperCase() + camel.slice(1, camel.length);
 
   const content = `import request from 'supertest';
-  import { testHelper } from '@root/test/testHelper';
   import express from 'express';
   
   describe('${upper} route test', () => {
     let app: express.Express;
-    beforeAll(() => {
-      return testHelper.getApp().then(_app => {
-        app = _app;
-      });
+    beforeAll(async () => {
     });
     describe('POST: /${domain}s', () => {
       it('success', async () => {

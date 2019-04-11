@@ -7,6 +7,7 @@ const repo = 'repo';
 const repoimpl = 'repoimpl';
 const route = 'route';
 const test = 'test';
+const mock = 'mock';
 
 const generateRoute = require('../src/generateRoute');
 const generateRouteTest = require('../src/generateRouteTest');

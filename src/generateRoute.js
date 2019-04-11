@@ -1,4 +1,4 @@
-const routePath = './src/server/interfaces/http';
+const routePath = './src/interfaces/http';
 const makeCamel = require('./utils');
 const fs = require('fs');
 const mkdirp = require('mkdirp');
@@ -7,13 +7,16 @@ module.exports = function generateRoute(component, domain) {
   let camel = makeCamel(domain);
   let upper = camel[0].toUpperCase() + camel.slice(1, camel.length);
   const content = `
+  import { FindResult } from '@common/models/FindResult';
+  import { IFilter } from '@common/models/QueryOption';
   import { Route } from '@common/models/Route';
-  import * as express from 'express';
-  import { httpSuccessResponse } from '@utils/httpSender';
-  import { I${upper}Repository } from '@domain/${domain}/${domain}.repository';
   import { FilterSchema } from '@common/validateSchemas/FilterSchema';
-  import Joi from 'joi';
   import { ${upper} } from '@domain/${domain}/${domain}.model';
+  import { authGuard } from '@infra/guard/auth.guard';
+  import { I${upper}Repository } from '@domain/${domain}/${domain}.repository';
+  import { httpSuccessResponse } from '@utils/httpSender';
+  import * as express from 'express';
+  import Joi from 'joi';
 
   export class ${upper}Route implements Route {
     private router: express.Router;
@@ -27,6 +30,7 @@ module.exports = function generateRoute(component, domain) {
        * /${domain}s:
        *   post:
        *     description: ${upper} API
+       *     summary: ${upper} API
        *     tags:
        *       - ${upper}s
        *     produces:
@@ -48,6 +52,7 @@ module.exports = function generateRoute(component, domain) {
        * /${domain}s:
        *   get:
        *     description: ${upper} API
+       *     summary: ${upper} API
        *     tags:
        *       - ${upper}s
        *     produces:
@@ -82,6 +87,7 @@ module.exports = function generateRoute(component, domain) {
        * /${domain}s/{id}:
        *   get:
        *     description: ${upper} API
+       *     summary: ${upper} API
        *     tags:
        *       - ${upper}s
        *     produces:
@@ -102,7 +108,8 @@ module.exports = function generateRoute(component, domain) {
        * @swagger
        * /${domain}s:
        *   put:
-       *     description: Update ${camel}
+       *     description: where 절에 어떤 프로퍼티가 어떤 값을 가진 데이터를 수정할지 명시한다.
+       *     summary: where 절에 어떤 프로퍼티가 어떤 값을 가진 데이터를 수정할지 명시한다.
        *     tags:
        *       - ${upper}s
        *     produces:
@@ -114,18 +121,15 @@ module.exports = function generateRoute(component, domain) {
        *           properties:
        *             data:
        *               $ref: '#/definitions/${upper}'
-       *             option:
-       *               type: object
-       *               schema:
-       *                 type: object
-       *                 properties:
-       *                   where:
-       *                     type: string
+       *             where:
+       *               $ref: '#/definitions/${upper}'
        *     responses:
        *       200:
        *         description: Success
        *         schema:
-       *           $ref: '#/definitions/${upper}'
+       *           properties:
+       *             count:
+       *               type: integer
        */
       this.router.put('', (...args) => this.update(...args));
   
@@ -134,6 +138,7 @@ module.exports = function generateRoute(component, domain) {
        * /${domain}s:
        *   delete:
        *     description: Delete ${camel}
+       *     summary: Delete ${camel}
        *     tags:
        *       - ${upper}s
        *     produces:
@@ -169,22 +174,21 @@ module.exports = function generateRoute(component, domain) {
       }
     }
   
-    // @authGuard
-    private async findAll(
-      req: express.Request,
-      res: express.Response,
-      next: express.NextFunction
-    ) {
+    @authGuard
+    private async findAll(req: express.Request, res: express.Response, next: express.NextFunction) {
       try {
-        let { value, error } = Joi.validate(req.query, FilterSchema, {
+        let { value, error }: { value: IFilter<${upper}>; error: Error } = Joi.validate(req.query, FilterSchema, {
           convert: true
         });
   
         if (error) return next(error);
-        
+  
         let payload = await this.${camel}Repository.findAll(value);
-        
-        return httpSuccessResponse(res, {payload});
+        let totalCount = await this.${camel}Repository.getCount({ where: value.where || {} });
+  
+        let findResult = new FindResult(totalCount, payload);
+  
+        return httpSuccessResponse(res, findResult);
       } catch (err) {
         return next(err);
       }
@@ -211,10 +215,10 @@ module.exports = function generateRoute(component, domain) {
       next: express.NextFunction
     ) {
       try {
-        let { data, option } = req.body;
-        let [count, payload] = await this.${camel}Repository.update(data, option);
+        let { data, where } = req.body;
+        const count = await this.${camel}Repository.update(data, { where });
   
-        return httpSuccessResponse(res, {payload, count});
+        return httpSuccessResponse(res, { count });
       } catch (err) {
         return next(err);
       }
