@@ -9,7 +9,7 @@
 먼저 생성한 스크립트 파일을 읽어들이기 위해 환경변수를 설정한다.
 
 ```sh
-export PATH=/Users/namhoonlee/Desktop/git/ddd-server-component-generator-ts/bin:$PATH
+export PATH=/Users/namhoonlee/Desktop/git/ddd-api-generator/bin:$PATH
 ```
 
 위 명령어는 특정 디렉토리의 로컬 환경변수 이므로 전역으로 사용하기 위해서는

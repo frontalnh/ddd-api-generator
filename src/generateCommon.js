@@ -29,26 +29,27 @@ function generateIResponseDto() {
 module.exports = function generateCommon() {
   console.log('Generate common');
   let content = `import { FindOptionsAttributesArray, Transaction } from 'sequelize'
-  import { IWhereOptions } from 'sequelize-typescript/lib/interfaces/IWhereOptions'
-  
-  export interface IFilter<T> {
-    where?: IWhereOptions<T>
-    fields?
-    order?: any
-    limit?: number
-    skip?: number
-    offset?: number
-    include?: any[]
-    attributes?: FindOptionsAttributesArray
-    searchKey?: string
-    raw?: boolean
-    transaction?: Transaction
+  import { IFindOptions } from 'sequelize-typescript/lib/interfaces/IFindOptions';
+
+  export interface IFilter<T> extends IFindOptions<T> {
+    where?: any;
+    fields?;
+    order?: any;
+    limit?: number;
+    skip?: number;
+    offset?: number;
+    include?: any[];
+    attributes?: FindOptionsAttributesArray;
+    searchKey?: string;
+    raw?: boolean;
+    transaction?: Transaction;
   }
   
   export interface IUpdateOption<T> {
-    where: Partial<T>
-    transaction?: Transaction
-  }  
+    where: Partial<T>;
+    transaction?: Transaction;
+  }
+  
   `;
 
   mkdirp.sync(`${commonPath}/models`);
