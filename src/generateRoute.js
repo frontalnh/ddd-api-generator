@@ -183,8 +183,9 @@ module.exports = function generateRoute(component, domain) {
   
         if (error) return next(error);
   
-        let payload = await this.${camel}Repository.findAll(value);
-        let totalCount = await this.${camel}Repository.getCount({ where: value.where || {} });
+        const option = this.convertSearchKey(value);
+        let payload = await this.${camel}Repository.findAll(option);
+        let totalCount = await this.${camel}Repository.getCount({ where: option.where || {} });
   
         let findResult = new FindResult(totalCount, payload);
   
@@ -194,6 +195,17 @@ module.exports = function generateRoute(component, domain) {
       }
     }
   
+    private convertSearchKey(option: IFilter<${upper}>) {
+      if (option.searchKey) {
+        if (!option.where) option.where = {};
+        Object.assign(option.where, {
+          $or: [{ title: { $like: '%' + option.searchKey + '%' } }]
+        });
+      }
+  
+      return option;
+    }
+
     private async findById(
       req: express.Request,
       res: express.Response,

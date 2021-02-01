@@ -28,11 +28,11 @@ function generateIResponseDto() {
 
 module.exports = function generateCommon() {
   console.log('Generate common');
-  let content = `import { FindOptionsAttributesArray, Transaction } from 'sequelize'
+  let content = `import { FindOptionsAttributesArray, Transaction, WhereOptions } from 'sequelize';
   import { IFindOptions } from 'sequelize-typescript/lib/interfaces/IFindOptions';
 
   export interface IFilter<T> extends IFindOptions<T> {
-    where?: any;
+    where?: WhereOptions<T>;
     fields?;
     order?: any;
     limit?: number;

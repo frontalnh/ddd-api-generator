@@ -17,17 +17,14 @@ module.exports = function generateRepositoryImpl(component, domain) {
     constructor() {}
   
     async save(${camel}: ${upper}) {
-      return await ${camel}.save();
+      return ${camel}.save();
     }
   
     async saveWithTx(${camel}: ${upper}, transaction: Transaction) {
-      return await ${camel}.save({ transaction });
+      return ${camel}.save({ transaction });
     }
   
     public async findAll(filter: IFilter<${upper}>) {
-      if (filter.searchKey) {
-        Object.assign(filter.where, { $or: [{ name: { $like: '%' + filter.searchKey + '%' } }] });
-      }
       if (!filter.raw) return ${upper}.findAll(filter);
   
       let datas = await ${upper}.findAll(filter);
@@ -39,11 +36,11 @@ module.exports = function generateRepositoryImpl(component, domain) {
     }
   
     async findById(id: number) {
-      return await ${upper}.findByPrimary(id);
+      return ${upper}.findByPrimary(id);
     }
 
     async getCount(filter: ICountOptions<${upper}>) {
-      return await ${upper}.count(filter);
+      return ${upper}.count(filter);
     }
 
     public async getSum(prop, filter: AggregateOptions) {
@@ -60,7 +57,7 @@ module.exports = function generateRepositoryImpl(component, domain) {
     }
   
     async delete(option: DestroyOptions): Promise<number> {
-      return await ${upper}.destroy(option);
+      return ${upper}.destroy(option);
     }
   }
   `;
