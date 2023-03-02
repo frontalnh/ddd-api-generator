@@ -12,6 +12,6 @@
     "@frontalnh/json-dot-parser": "^0.1.5",
     "commander": "^2.19.0",
     "fs": "0.0.1-security",
-    "mkdirp": "^0.5.1"
+    "mkdirp": "^0.5.6"
   }
 }
